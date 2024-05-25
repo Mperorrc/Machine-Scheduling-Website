@@ -1,0 +1,490 @@
+body, html {
+    margin: 0;
+    padding: 0;
+}
+
+.container-head{
+    height: 7vh;
+    width:100vw;
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(240, 220, 220);
+}
+
+.pages{
+    width:10%;
+    margin: 10px;
+    margin-bottom: 0px;
+    background-color: rgb(56, 151, 223);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    font-family: serif;
+    color: white;
+    text-shadow: 0 0 10px black;
+    box-shadow: 5px 0px 2px 1px darkblue;
+    font-weight:700;
+}
+
+.container-body{
+    height: 92.3vh;
+    width:100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.center-panel{
+    height: 100%;
+    width:70%;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: row;
+    background-color: white;
+}
+
+.jom-basis{
+    width: 30%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.jom-numbers{
+    width: 100%;
+    height: 27%;
+    display: flex;
+    flex-direction: row;
+}
+
+.jom-labels{
+    width: 60%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.jom-labels-text{
+    margin-top: 7%;
+    margin-left: 10%;
+}
+
+.jom-inputs{
+    width: 40%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#num_machines,#num_jobs,#num_operations{
+    height: 17%; 
+    margin-top: 7%;
+    margin-left: 5%; 
+    width: 70%;
+    border-radius: 8px;
+}
+
+.jom-type{
+    width: 100%;
+    height: 14%;
+    display: flex;
+    flex-direction: column;
+}
+
+.jom-type-child{
+    width: 90%;
+    margin-bottom: 7%;
+    margin-left: 6%;
+}
+
+.jom-constraints{
+    width: 100%;
+    height: 59%;
+    display: flex;
+    flex-direction: column;
+}
+
+.jom-constraints-label{
+    height: 10%;
+    padding-left: 6%;
+    width: 100%;
+}
+
+.jom-constraints-container{
+    height: 90%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.jom-container-row{
+    width: 100%;
+    align-content: center;
+    height: 40%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    padding-bottom: 4%;
+    flex-shrink: 0;
+}
+
+.jom-row-div{
+    margin-top: 3%;
+    width: 100%;
+    height: 20%;
+    display: flex;
+    flex-direction: row;
+}
+
+.jom-row-label{
+    height: 100%;
+    width: 50%;
+    align-content: center;
+    justify-content: center;
+    padding-left: 6%;
+}
+
+.jom-select{
+    width:40%;
+}
+
+.jom-ipt{
+    width:40%;
+    height: 60%;
+    margin-top: 2%;
+}
+
+.jom-container-delete-button {
+    margin-left: 30%;
+    width: 40%;
+    height: 90%;
+    border-radius: 13px;
+    background-color: #ffcccc;;
+    color: black;
+    border: 2px solid black; 
+    transition: background-color 0.4s ease-out; 
+}
+
+.jom-container-delete-button:hover {
+    background-color: red;
+    color: white; 
+}
+
+.jom-container-button-row{
+    width: 100%;
+    align-content: center;
+    height: 30%;
+    padding-top: 10%;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.jom-container-button {
+    margin-left: 30%;
+    width: 40%;
+    height: 30%;
+    border-radius: 13px;
+    background-color: aquamarine;
+    color: black;
+    border: 2px solid black; 
+    transition: background-color 0.4s ease-out; 
+}
+
+.jom-container-button:hover {
+    background-color: green; 
+    color:white;
+}
+
+.jom-table{
+    width: 70%;
+    height: 100%;
+    background-color: yellow;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid;
+}
+
+.jom-matrix{
+    width: 100%;
+    height: 60%;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    border: 1px solid;
+}
+
+.op-row{
+    width: 100%;
+    height: 10%;
+    display: flex;
+    flex-direction: row;
+}
+
+.due-date-el{
+    background-color: white;
+    height: 100%;
+    flex: 0 0 10%;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    text-justify: center;
+    margin-left: 4%;
+}
+
+#jom-ipt{
+    width: 80%;
+    height: 40%;
+}
+.op-row-first{
+    background-color: white;
+    height: 100%;
+    flex: 0 0 10%;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    text-justify: center;
+}
+
+.op-el{
+    background-color: white;
+    height: 100%;
+    flex: 0 0 30%;
+    align-items: center;
+    margin-left: 4%;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    text-justify: center;
+}
+
+.jom-row{
+    width: 100%;
+    min-height: 10%;
+    display: flex;
+    flex-direction: row;
+    margin-top: 2%;
+}
+
+.job-el-first{
+    background-color: white;
+    height: 100%;
+    flex: 0 0 10%;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    text-justify: center;
+}
+
+.jom-el{
+    background-color: white;
+    height: 100%;
+    flex: 0 0 30%;
+    align-items: center;
+    margin-left: 4%;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    text-justify: center;
+    display: flex;
+    flex-direction: row;
+}
+
+.jom-el-label{
+    width:50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.jom-el-p{
+    height: 50%;
+    width: 100%;
+    font-size: 8pt;
+    align-content:center ;
+    justify-content: center;
+}
+
+.jom-el-inputs{
+    width:50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.jom-el-m,.jom-el-t{
+    height: 35%;
+    width: 90%;
+}
+
+.jom-machines{
+    width: 100%;
+    height: 40%;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    border: 1px solid;
+}
+
+.top-row{
+    width: 100%;
+    min-height: 10%;
+    display: flex;
+    flex-direction: row;
+}
+
+.top-row-first{
+    background-color: white;
+    height: 100%;
+    flex: 0 0 13%;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    text-justify: center;
+}
+
+.top-row-head{
+    background-color: white;
+    height: 100%;
+    flex: 0 0 30%;
+    align-items: center;
+    margin-left: 4%;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    text-justify: center;
+}
+
+.jom-machines-rows{
+    width: 100%;
+    min-height: 10%;
+    display: flex;
+    flex-direction: row;
+    margin-top: 2%;
+}
+
+.jom-machines-first{
+    background-color: white;
+    height: 100%;
+    flex: 0 0 13%;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    text-justify: center;
+}
+
+.jom-machines-el{
+    background-color: white;
+    height: 100%;
+    flex: 0 0 30%;
+    align-items: center;
+    margin-left: 4%;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    text-justify: center;
+    display: flex;
+    flex-direction: row;
+}
+
+.jom-machine-input{
+    height: 100%;
+    width: 100%;
+}
+
+.right-panel{
+    height: 100%;
+    width:30%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid;
+}
+
+.compile-panel{
+    height: 10%;
+    width: 100%;
+    align-content: center;
+}
+
+.results-button {
+    margin-left: 30%;
+    width: 40%;
+    height: 50%;
+    border-radius: 13px;
+    background-color: aquamarine;
+    color: black;
+    border: 2px solid black; 
+    transition: background-color 0.4s ease-out; 
+}
+
+.results-button:hover {
+    background-color: green; 
+    color:white;
+}
+
+.results-panel{
+    height: 90%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.costs_container{
+    height: 30%;
+    width: 100%;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.costs_row{
+    height: 20%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.costs_cell{
+    height: 100%;
+    width: 20%;
+    align-content: center;
+    text-align: center;
+    border: 1px solid black;
+}
+
+.net-costs{
+    height: 15%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+}
+
+.total-costs, .penalty-costs{
+    height: 50%;
+    width: 100%;
+    text-align: center;
+    align-content: center;
+}
+
+.scheduler-div{
+    height: 40%;
+    width:95%;
+    margin-top: 5%;
+}
+
+.canvas-div{
+    height: 100%;
+    width: 100%;
+    font-size: 20px;
+}

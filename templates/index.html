@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{url_for('static',filename = 'styles.css')}}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        var check=true;
+        let num_machines = 0;
+        let num_jobs = 0;
+        let num_operations = 0;
+        let jom_mat = [];
+        let machine_mat = [];
+        let selectedOptionValue = 1;
+        let due_dates = [];
+        let arrival_dates = [];
+        let penalty_costs = [];
+        let machine_constraints_cnt = 0;
+        let machine_constraints = [];
+        
+        function initializeMatrices() {
+            jom_mat = [];
+            for (let i = 0; i < 100; i++) {
+                jom_mat.push([]);
+                for (let j = 0; j < 100; j++) {
+                    jom_mat[i].push([0,0]);
+                }
+            }
+            machine_mat = [];
+            for(let i=0;i<100;i++){
+                machine_mat_row = [];
+                for(let j=0;j<4;j++){
+                    machine_mat_row.push(0);
+                }
+                machine_mat.push(machine_mat_row);
+            }
+
+            due_dates = [];
+            for(let i=0;i<100;i++){
+                due_dates.push(0);
+            }
+
+            arrival_dates = [];
+            for(let i=0;i<100;i++){
+                arrival_dates.push(0);
+            }
+
+            penalty_costs = [];
+            for(let i=0;i<100;i++){
+                penalty_costs.push(0);
+            }
+        }
+
+        function updateMachines(value) {
+            if(value<=100){
+                num_machines = parseInt(value);
+                console.log("Value updated: ", num_machines);
+                updateMachineRows();
+            }
+            document.getElementById("num_machines").value = num_machines;
+        }
+        function updateJobs(value) {
+            if(value<=100){
+                num_jobs = parseInt(value);
+                console.log("Value updated: ", num_jobs);
+                updateJomRows();
+            }
+            document.getElementById("num_jobs").value = num_jobs;
+        }
+        function updateOperations(value) {
+            if(value<=100){
+                num_operations = parseInt(value);
+                console.log("Value updated: ", num_operations);
+                updateJomRows();
+            }
+            document.getElementById("num_operations").value = num_operations;
+        }
+
+        function updateJomRows() {
+            const jomTable = document.querySelector('.jom-matrix');
+            jomTable.innerHTML = '';
+            const oprow = document.createElement('div');
+            oprow.className='op-row';
+            const opelF = document.createElement('div');
+            opelF.textContent = "Jobs";
+            opelF.className= 'op-row-first';
+            oprow.appendChild(opelF);
+            for(let i=0;i<num_operations;i++){
+                if(i==0){
+                    const arrival_date = document.createElement('div');
+                    arrival_date.className= 'due-date-el';
+                    arrival_date.textContent = "Arrival time";
+                    oprow.appendChild(arrival_date);
+                    const due_date = document.createElement('div');
+                    due_date.className= 'due-date-el';
+                    due_date.textContent = "Due time";
+                    oprow.appendChild(due_date);
+                    const penalty_cost_div = document.createElement('div');
+                    penalty_cost_div.className= 'due-date-el';
+                    penalty_cost_div.textContent = "Penalty Cost";
+                    oprow.appendChild(penalty_cost_div);
+                }
+                const opel = document.createElement('div');
+                opel.className= 'op-el';
+                opel.textContent = "Operation " +(i+1);
+                oprow.appendChild(opel);
+            }
+            jomTable.append(oprow);
+            for(let i = 0; i < num_jobs; i++) {
+                const jomRow = document.createElement('div');
+                jomRow.className = 'jom-row';
+                const jobdiv = document.createElement('div');
+                jobdiv.className = 'job-el-first';
+                jobdiv.textContent = "Job "+(i+1);
+                jomRow.appendChild(jobdiv); 
+                for(let j = 0; j < num_operations; j++) {
+                    if(j==0){
+                        const arrival_date = document.createElement('div');
+                        arrival_date.className= 'due-date-el';
+                        const arrival_input = document.createElement('input');
+                        arrival_input.type='number';
+                        arrival_input.id = 'jom-ipt';
+                        arrival_input.value= arrival_dates[i];
+                        arrival_input.addEventListener('input', function(event) {
+                            arrival_dates[i] = event.target.value;
+                        });
+                        arrival_date.appendChild(arrival_input);
+                        jomRow.appendChild(arrival_date);
+                        const due_date = document.createElement('div');
+                        due_date.className= 'due-date-el';
+                        const input = document.createElement('input');
+                        input.type='number';
+                        input.id = 'jom-ipt';
+                        input.value= due_dates[i];
+                        input.addEventListener('input', function(event) {
+                            due_dates[i] = event.target.value;
+                        });
+                        due_date.appendChild(input);
+                        jomRow.appendChild(due_date);
+
+                        const penalty_cost_div = document.createElement('div');
+                        penalty_cost_div.className= 'due-date-el';
+                        const pen_input = document.createElement('input');
+                        pen_input.type='number';
+                        pen_input.id = 'jom-ipt';
+                        pen_input.value= due_dates[i];
+                        pen_input.addEventListener('input', function(event) {
+                            penalty_costs[i] = event.target.value;
+                        });
+                        penalty_cost_div.appendChild(pen_input);
+                        jomRow.appendChild(penalty_cost_div);
+                    }
+                    const jomEl = document.createElement('div');
+                    jomEl.className = 'jom-el';
+                    const label_div = document.createElement('div');
+                    label_div.className = 'jom-el-label';
+                    const p1 = document.createElement('div');
+                    p1.className = 'jom-el-p';
+                    const p2 = document.createElement('div');
+                    p2.className = 'jom-el-p';
+                    p1.textContent = 'Machine Number :';
+                    p2.textContent = 'Time (in minutes) :';
+                    const jom_inputs = document.createElement('div'); 
+                    jom_inputs.className = 'jom-el-inputs';
+                    const machine_input = document.createElement('input');
+                    machine_input.className = 'jom-el-m';
+                    const time_input = document.createElement('input');
+                    time_input.className = 'jom-el-t';
+                    machine_input.type = 'number';
+                    time_input.type = 'number';
+                    machine_input.value = jom_mat[i][j][0];
+                    time_input.value = jom_mat[i][j][1];
+                    machine_input.addEventListener('input', function(event) {
+                        jom_mat[i][j][0] = event.target.value;
+                    });
+                    time_input.addEventListener('input', function(event) {
+                        jom_mat[i][j][1] = event.target.value;
+                    });
+                    label_div.appendChild(p1);
+                    label_div.appendChild(p2);
+                    jom_inputs.appendChild(machine_input);
+                    jom_inputs.appendChild(time_input);
+                    jomEl.appendChild(label_div);
+                    jomEl.appendChild(jom_inputs);
+                    jomRow.appendChild(jomEl);
+                }
+                jomTable.appendChild(jomRow);
+            }
+        }
+
+        function updateMachineRows(){
+            const machines = document.querySelector('.jom-machines');
+            machines.innerHTML = '';
+            const toprow = document.createElement('div');
+            toprow.className='top-row';
+            const header1 = document.createElement('div');
+            header1.textContent = "Machines";
+            header1.className= 'top-row-first';
+            toprow.appendChild(header1);
+            const header2 = document.createElement('div');
+            header2.textContent = "Machine Count";
+            header2.className= 'top-row-head';
+            toprow.appendChild(header2);
+            const header3 = document.createElement('div');
+            header3.textContent = "Running Energy Consumption";
+            header3.className= 'top-row-head';
+            toprow.appendChild(header3);
+            const header4 = document.createElement('div');
+            header4.textContent = "Warmup Energy Consumption";
+            header4.className= 'top-row-head';
+            toprow.appendChild(header4);
+            const header5 = document.createElement('div');
+            header5.textContent = "Waiting Energy Consumption";
+            header5.className= 'top-row-head';
+            toprow.appendChild(header5);
+            machines.appendChild(toprow);
+            for(let i=0;i<num_machines;i++){
+                const machine_rows = document.createElement('div');
+                machine_rows.className = 'jom-machines-rows';
+                const machdiv = document.createElement('div');
+                machdiv.className = 'jom-machines-first';
+                machdiv.textContent = "Machine "+(i+1);
+                machine_rows.appendChild(machdiv); 
+                for(let j=0;j<4;j++){
+                    const machine_el = document.createElement('div');
+                    machine_el.className = 'jom-machines-el';
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.className = 'jom-machine-input';
+                    input.value = machine_mat[i][j];
+                    input.addEventListener('input', function(event) {
+                        machine_mat[i][j] = event.target.value;
+                    });
+                    machine_el.appendChild(input);
+                    machine_rows.append(machine_el);
+                }
+
+                machines.appendChild(machine_rows);
+            }
+        }
+
+        function updateMachineConstraints(){
+            const container = document.querySelector('.jom-constraints-container');
+            container.innerHTML='';
+            for(let i = 0; i < machine_constraints_cnt; i++){
+                const const_row = document.createElement('div');
+                const_row.className = 'jom-container-row';
+                
+                const div1 = document.createElement('div');
+                div1.className = 'jom-row-div';
+                const div2 = document.createElement('div');
+                div2.className = 'jom-row-div';
+                const div3 = document.createElement('div');
+                div3.className = 'jom-row-div';
+                const div4 = document.createElement('div');
+                div4.className = 'jom-row-div';
+                
+                const labeldiv1 = document.createElement('div');
+                labeldiv1.className = 'jom-row-label';
+                labeldiv1.textContent = "Contraint type :";
+                const labeldiv2 = document.createElement('div');
+                labeldiv2.className = 'jom-row-label';
+                labeldiv2.textContent = "Machine Number :";
+                const labeldiv3 = document.createElement('div');
+                labeldiv3.className = 'jom-row-label';
+                labeldiv3.textContent = "Time (in minutes) :";
+
+                const selectElement = document.createElement('select');
+                selectElement.className = 'jom-select';
+                const addOption = document.createElement('option');
+                addOption.textContent = "Add machine";
+                addOption.value = 1;
+                const removeOption = document.createElement('option');
+                removeOption.textContent = "Remove machine";
+                removeOption.value = 2;
+
+                selectElement.appendChild(addOption);
+                selectElement.appendChild(removeOption);
+                selectElement.addEventListener('change', function(event) {
+                    const selectedValue = parseInt(event.target.value);
+                    console.log(selectedValue);
+                    machine_constraints[i].constraint_type = selectedValue; 
+                });
+                
+
+                const machine_num_ipt = document.createElement('input');
+                machine_num_ipt.type = 'number';
+                machine_num_ipt.value = machine_constraints[i].machine_num;
+                machine_num_ipt.className = 'jom-ipt';
+                machine_num_ipt.addEventListener('input', function(event) {
+                    machine_constraints[i].machine_num = event.target.value;
+                });
+                
+                const machine_time_ipt = document.createElement('input');
+                machine_time_ipt.type = 'number';
+                machine_time_ipt.value = machine_constraints[i].time;
+                machine_time_ipt.className = 'jom-ipt';
+                machine_time_ipt.addEventListener('input', function(event) {
+                    machine_constraints[i].time = event.target.value;
+                });
+
+                const delete_button = document.createElement('button');
+                delete_button.textContent = "Delete Constraint";
+                delete_button.className = 'jom-container-delete-button'
+                delete_button.addEventListener('click', function() {
+                    machine_constraints.splice(i, 1);
+                    machine_constraints_cnt--;
+                    updateMachineConstraints();
+                });
+
+
+                div1.appendChild(labeldiv1);
+                div1.appendChild(selectElement);
+                div2.appendChild(labeldiv2);
+                div2.appendChild(machine_num_ipt);
+                div3.appendChild(labeldiv3);
+                div3.appendChild(machine_time_ipt);
+                div4.appendChild(delete_button);
+                
+
+                const_row.appendChild(div1);
+                const_row.appendChild(div2);
+                const_row.appendChild(div3);
+                const_row.appendChild(div4);
+                
+                container.appendChild(const_row);
+            }
+            
+            const add_button_row = document.createElement('div');
+            add_button_row.className = 'jom-container-button-row';
+            
+            const add_button = document.createElement('button');
+            add_button.textContent = "Add Constraint";
+            add_button.className = 'jom-container-button'
+            add_button.addEventListener('click', function() {
+                machine_constraints_cnt++;
+                const machine_constraint_element ={
+                    constraint_type : 1,
+                    machine_num : 0,
+                    time : 0
+                };
+                machine_constraints.push(machine_constraint_element);
+                updateMachineConstraints();
+            });
+            
+            add_button_row.appendChild(add_button);
+            container.appendChild(add_button_row);
+        }
+
+        function updateTypeOption() {
+            const selectElement = document.getElementById("type-options");
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            selectedOptionValue = parseInt(selectedOption.value);
+            console.log("Selected option value:", selectedOptionValue);
+        }
+
+        function postFunction(){
+            const jom_contents ={
+                num_machines :num_machines,
+                num_jobs : num_jobs,
+                num_operations : num_operations,
+                jom_mat : jom_mat,
+                machine_mat : machine_mat,
+                minimization_criteria : selectedOptionValue,
+                due_dates : due_dates,
+                arrival_dates : arrival_dates,
+                num_constraints : machine_constraints_cnt, 
+                constraints : machine_constraints,
+                penalty_costs : penalty_costs
+            }
+            console.log(jom_contents);
+            const jsonData = JSON.stringify(jom_contents);
+            fetch('/schedule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                const container = document.querySelector('.results-panel');
+                container.innerHTML='';
+                const costsDiv = document.createElement('div');
+                costsDiv.className = 'costs_container';
+                
+                const machine_res_div = document.createElement('div')
+                machine_res_div.className = 'costs_row'
+                const machine_num_div = document.createElement('div')
+                machine_num_div.className = 'costs_cell'
+                const machine_idle_time = document.createElement('div')
+                machine_idle_time.className = 'costs_cell'
+                const machine_running_costs = document.createElement('div')
+                machine_running_costs.className = 'costs_cell'
+                const machine_waiting_costs = document.createElement('div')
+                machine_waiting_costs.className = 'costs_cell'
+                const machine_total_costs = document.createElement('div')
+                machine_total_costs.className = 'costs_cell'
+
+                machine_num_div.textContent = "Machine Number";
+                machine_idle_time.textContent = "Idle Time";
+                machine_running_costs.textContent = "Running costs";
+                machine_waiting_costs.textContent = "Waiting costs";
+                machine_total_costs.textContent = "Total costs";
+
+                machine_res_div.appendChild(machine_num_div);
+                machine_res_div.appendChild(machine_idle_time);
+                machine_res_div.appendChild(machine_running_costs);
+                machine_res_div.appendChild(machine_waiting_costs);
+                machine_res_div.appendChild(machine_total_costs);
+                costsDiv.appendChild(machine_res_div);
+
+                for(let i=0;i<num_machines;i++){
+                    const machine_res_div = document.createElement('div')
+                    machine_res_div.className = 'costs_row'
+                    const machine_num_div = document.createElement('div')
+                    machine_num_div.className = 'costs_cell'
+                    const machine_idle_time = document.createElement('div')
+                    machine_idle_time.className = 'costs_cell'
+                    const machine_running_costs = document.createElement('div')
+                    machine_running_costs.className = 'costs_cell'
+                    const machine_waiting_costs = document.createElement('div')
+                    machine_waiting_costs.className = 'costs_cell'
+                    const machine_total_costs = document.createElement('div')
+                    machine_total_costs.className = 'costs_cell'
+
+                    machine_num_div.textContent = i+1;
+                    machine_idle_time.textContent = data.idle_times[i];
+                    machine_running_costs.textContent = data.running_energy_costs[i];
+                    machine_waiting_costs.textContent = data.waiting_energy_costs[i];
+                    machine_total_costs.textContent = data.total_energy_costs[i];
+
+                    machine_res_div.appendChild(machine_num_div);
+                    machine_res_div.appendChild(machine_idle_time);
+                    machine_res_div.appendChild(machine_running_costs);
+                    machine_res_div.appendChild(machine_waiting_costs);
+                    machine_res_div.appendChild(machine_total_costs);
+                    costsDiv.appendChild(machine_res_div);
+                }
+                container.appendChild(costsDiv);
+                
+                const net_costs_div = document.createElement('div');
+                net_costs_div.className='net-costs';
+                const total_costs_div = document.createElement('div');
+                total_costs_div.className = 'total-costs';
+                const penalty_costs_div = document.createElement('div');
+                penalty_costs_div.className = 'penalty-costs';
+
+                total_costs_div.textContent = `Total Costs : ${data.total_costs}`;
+                penalty_costs_div.textContent = `Penalty Costs : ${data.penalty_costs}`;
+
+                net_costs_div.appendChild(penalty_costs_div);
+                net_costs_div.appendChild(total_costs_div);
+                container.appendChild(net_costs_div);
+
+                let scheduledJobs = [];
+                for (let i = 0; i < data.scheduled_jobs.length; i += 4) {
+                    scheduledJobs.push([
+                        data.scheduled_jobs[i],
+                        data.scheduled_jobs[i + 1],
+                        data.scheduled_jobs[i + 2],
+                        data.scheduled_jobs[i + 3]
+                    ]);
+                }
+                const scheduler_div = document.createElement('div');
+                scheduler_div.className = 'scheduler-div';
+                const canvas = document.createElement('canvas');
+                canvas.className = 'canvas-div';
+                const ctx = canvas.getContext('2d');
+
+                const maxEndTime = Math.max(...scheduledJobs.map(job => job[3]));
+
+                const colors = Array.from({ length: num_jobs * num_operations }, (_, i) => `hsl(${(i * 360) / (num_jobs * num_operations)}, 70%, 50%)`);
+
+                canvas.width = 600;
+                canvas.height = 600;  
+
+                const barHeight = 100;
+                const barPadding = 10;
+                scheduledJobs.forEach((job, i) => {
+                    const jobIndex = job[0];
+                    const operationIndex = job[1];
+                    const machineIndex = jom_mat[jobIndex][operationIndex][0];
+                    const color = colors[i];
+                    const barWidth = (job[3] - job[2])*(canvas.width / maxEndTime);
+                    const x = 60 + job[2]*(canvas.width / maxEndTime);
+                    const y = (jobIndex * barHeight);
+
+                    ctx.fillStyle = color;
+                    ctx.font = '20px Arial';
+                    ctx.fillRect(x, y + barPadding / 2, barWidth, barHeight - barPadding);
+
+                    ctx.fillStyle = 'black';
+                    ctx.fillText(machineIndex, x + barWidth / 2, y + barHeight / 2);
+                });
+                ctx.font = '20px Arial';
+                ctx.fillStyle = 'black'; // Set text color
+                
+                for (let i = 0; i <= maxEndTime + 2; i += 2) {
+                    ctx.fillText(i.toString(), i * (canvas.width / maxEndTime), scheduledJobs.length*barHeight+10);
+                }
+
+                for (let i = 0; i < num_jobs; i++) {
+                    ctx.fillText(`Job ${i + 1}`, 10, i * barHeight + barHeight / 2);
+                }
+
+                ctx.textAlign = 'center'; // Set text alignment
+                ctx.textBaseline = 'middle'; // Set text baseline
+                ctx.fillText('Time', canvas.width / 2, scheduledJobs.length*barHeight+15);
+
+                scheduler_div.appendChild(canvas);
+                container.append(scheduler_div);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        window.onload = function() {
+            document.getElementById("num_operations").value = num_operations;
+            document.getElementById("num_machines").value = num_machines;
+            document.getElementById("num_jobs").value = num_jobs;
+            initializeMatrices();
+            updateJomRows();
+            updateMachineRows();
+            updateMachineConstraints();
+            document.getElementById("type-options").addEventListener("change", updateTypeOption);            
+};
+    </script>
+    <div class = "container-head">
+        <div class = "pages">
+            page 1
+        </div>
+    </div>
+    <div class = "container-body">
+        <div class="center-panel">
+            <div class="jom-basis">
+                <div class="jom-numbers">
+                    <div class="jom-labels">
+                        <p class="jom-labels-text">Number of machines :</p>
+                        <p class="jom-labels-text">Number of Jobs :</p>
+                        <p class="jom-labels-text">Number of operations :</p>
+                    </div>
+                    <div class = jom-inputs>
+                        <input 
+                            type="number" 
+                            id="num_machines" 
+                            name="num_machines" 
+                            min="0" 
+                            max="100" 
+                            step="1"
+                            value="num_machines"
+                            onchange="updateMachines(this.value)"
+                        >
+                        <input 
+                            type="number" 
+                            id="num_jobs" 
+                            name="num_jobs" 
+                            min="0" 
+                            max="100" 
+                            step="1"
+                            value="num_jobs"
+                            onchange="updateJobs(this.value)"
+                        >
+                        <input 
+                            type="number" 
+                            id="num_operations" 
+                            name="num_operations" 
+                            min="0" 
+                            max="100" 
+                            step="1"
+                            value="num_operations"
+                            onchange="updateOperations(this.value)"
+                        >
+                    </div>
+                </div>
+                <div class="jom-type">
+                    <div class="jom-type-child">
+                        Select the minimization criteria :
+                    </div>
+                    <div class="jom-type-child">
+                        <select id="type-options" name="type-options">
+                            <option value=1>Tardy Time</option>
+                            <option value=2>Idle Energy cost consumption</option>
+                            <option value=3>Running Energy cost consumption</option>
+                            <option value=4>Waiting Energy cost consumption</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="jom-constraints">
+                    <div class="jom-constraints-label">
+                        Add Additional machine constraints :
+                    </div>
+                    <div class="jom-constraints-container">
+
+                    </div>
+                </div>
+            </div>
+            <div class="jom-table">
+                <div class="jom-matrix">
+                    
+                </div>
+                <div class="jom-machines">
+
+                </div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="compile-panel">
+                <button class="results-button" onclick="postFunction()" >
+                    Compile Results
+                </button>
+            </div>
+            <div class="results-panel">
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>
